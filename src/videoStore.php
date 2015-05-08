@@ -77,26 +77,31 @@ if(isset($_GET['name_input']) AND strlen($_GET['name_input']) != 0
 	}
 }
 	
-if (!($statement = $mysqli->prepare("SELECT name, category, length FROM Videos"))) {
+if (!($statement = $mysqli->prepare("SELECT name, category, length, rented FROM Videos"))) {
 	echo "prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
 }
 
-$statement->bind_param("ssi", $name, $category, $length); 
+$statement->bind_param("ssii", $name, $category, $length, $rented); 
 if (!$statement->execute()) {
 	echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
 }
-$statement->bind_result($resultName, $resultCategory, $resultLength);
+$statement->bind_result($resultName, $resultCategory, $resultLength, $resultRented);
 
 echo "<table border='1'>";
 echo "<tr>";
 echo "<th>Title</th>";
 echo "<th>Category</th>";
 echo "<th>Length (min)</th>";
+echo "<th>Status</th>";
 while ($statement->fetch()) {
 	echo "<tr>";
 	echo "<td>$resultName</td>";
 	echo "<td>$resultCategory</td>";
 	echo "<td>$resultLength</td>";
+	if ($resultRented)
+		echo "<td>checked out</td>";
+	else
+		echo "<td>available</td>";
 	echo "</tr>";
 }
 echo "</table>";
