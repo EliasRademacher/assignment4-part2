@@ -52,49 +52,50 @@ else
 	echo "Table already exists <br>";
 
 
+/* Add video to database */
 if(isset($_GET['name_input']) AND strlen($_GET['name_input']) != 0
 	AND isset($_GET['category_input']) AND strlen($_GET['category_input']) != 0
 	AND isset($_GET['length_input']) AND strlen($_GET['length_input']) != 0
 	) {
-
 	
 	$name = str_replace ('\'', '\\\'', $_GET['name_input']);
 	$category = str_replace ('\'', '\\\'', $_GET['category_input']);
 	$length = $_GET['length_input'];
 	
-	if (!is_numeric($length))
-		echo "length must be a number<br>";
-	
-	else{
+	if (isValidInput($mysqli, $name, $length)) {
 		if (!($statement = $mysqli->prepare("INSERT INTO Videos(name, category, length) VALUES
-			('$name', '$category', '$length')"))) {
+			('$name', '$category', '$length')")))
 			echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
-		}
 
-		if (!$statement->execute()) {
+		if (!$statement->execute())
 			echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
-		}
 	}
 }
-	
-if (!($statement = $mysqli->prepare("SELECT name, category, length, rented FROM Videos"))) {
+
+
+
+
+/* Display Table */
+if (!($statement = $mysqli->prepare("SELECT id, name, category, length, rented FROM Videos"))) {
 	echo "prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
 }
 
-$statement->bind_param("ssii", $name, $category, $length, $rented); 
+$statement->bind_param("issii", $id, $name, $category, $length, $rented); 
 if (!$statement->execute()) {
 	echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
 }
-$statement->bind_result($resultName, $resultCategory, $resultLength, $resultRented);
+$statement->bind_result($resultID, $resultName, $resultCategory, $resultLength, $resultRented);
 
 echo "<table border='1'>";
 echo "<tr>";
+echo "<th></th>";
 echo "<th>Title</th>";
 echo "<th>Category</th>";
 echo "<th>Length (min)</th>";
 echo "<th>Status</th>";
 while ($statement->fetch()) {
 	echo "<tr>";
+	echo "<td><button type=button onclick=deleteRow(1)>Delete</button></td>";
 	echo "<td>$resultName</td>";
 	echo "<td>$resultCategory</td>";
 	echo "<td>$resultLength</td>";
@@ -106,7 +107,44 @@ while ($statement->fetch()) {
 }
 echo "</table>";
 $statement->close();
+
+function  deleteRow($row) {
+	echo "$row<br>";
+}
+
+
+
+
+
+function isValidInput($mysqli, $name, $length) {
 	
+	/* Make sure video name doesn't already exist in database */
+	if (!($statement = $mysqli->prepare("SELECT name FROM Videos")))
+		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
+
+	$statement->bind_param("s", $n); 
+	if (!$statement->execute()) {
+		echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
+	}
+	$statement->bind_result($resultName);
+	
+	while ($statement->fetch()) {
+		if ($resultName == $name) {
+			echo "$name already exists in database<br>";
+			return FALSE;
+		}
+	}
+
+	$statement->close();
+	
+	/* Make sure "length" is a number */
+	if (!is_numeric($length)) {
+		echo "length must be a number<br>";
+		return FALSE;
+	}
+	
+	return TRUE;
+}
 	
 ?>
 
