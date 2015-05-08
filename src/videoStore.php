@@ -57,17 +57,25 @@ if(isset($_GET['name_input']) AND strlen($_GET['name_input']) != 0
 	AND isset($_GET['length_input']) AND strlen($_GET['length_input']) != 0
 	) {
 
-	$name = $_GET['name_input'];
-	$category = $_GET['category_input'];
-	$length = intval($_GET['length_input']);
-	
-	if (!($statement = $mysqli->prepare("INSERT INTO Videos(name, category, length) VALUES
-		('$name', '$category', '$length')"))) {
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
-	}
 
-	if (!$statement->execute()) {
-		echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
+	$name = str_replace ('\'', '\\\'', $_GET['name_input']);
+	$category = str_replace ('\'', '\\\'', $_GET['category_input']);
+	$length = $_GET['length_input'];
+	
+	else if (!is_numeric($length))
+		echo "length must be a number<br>";
+	
+	else {
+		
+		
+		if (!($statement = $mysqli->prepare("INSERT INTO Videos(name, category, length) VALUES
+			('$name', '$category', '$length')"))) {
+			echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
+		}
+
+		if (!$statement->execute()) {
+			echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
+		}
 	}
 }
 	
