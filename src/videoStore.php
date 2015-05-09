@@ -3,7 +3,7 @@
   <title>Video Store</title>
  </head>
  <body>
-	<p color="blue">Add a video to the database: </p>
+	<p>Add a video to the database: </p>
 	<form method="POST">
 		<p>name: <input type="text" name="name_input" /></p>
 		<p>category: <input type="text" name="category_input" /></p>
@@ -12,83 +12,35 @@
 	</form>
 
 <?php
+include 'videoStoreFunctions.php';
 error_reporting(E_ALL);
 ini_set('display_errors', 'On');
 
 $mysqli = new mysqli("oniddb.cws.oregonstate.edu",
 	"rademace-db", "8xYcLE6mhsNKxGMP", "rademace-db");
-
-
-
-
-
+if (!$mysqli || $mysqli->connect_errno)
+	echo "Connection error: " . $mysqli->connect_errno . " " . $mysqli->connect_error . "<br>";
+else
+	echo "Connected to onid database<br>";
 
 
 
 
 
 /* Handle requests from button clicks */
-if (isset($_POST['deleteID'])) {
-    if (!($stmt = $mysqli->prepare("DELETE FROM Videos
-		WHERE id = $_POST[deleteID]")))
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
-		
-	if (!$stmt->execute())
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error . "<br>";
-}
+if (isset($_POST['deleteID']))
+	deleteRow($mysqli);
 
-if (isset($_POST['deleteAll'])) {
-    $mysqli->query("DROP TABLE Videos");
-}
+if (isset($_POST['deleteAll']))
+	deleteAll($mysqli);
 
-if (isset($_POST['CheckInOut'])) {
-	
-	if (!($stmt = $mysqli->prepare("SELECT rented FROM Videos
-		WHERE id = $_POST[CheckInOut]")))
-			echo "Prepare for 'SELECT' failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
-	
-	$stmt->bind_param("i", $r); 
-	if (!$stmt->execute()) {
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error . "<br>";
-	}
-	$stmt->bind_result($isRented);
-	
-	$stmt->fetch();
-	
-	if ($isRented) {
-		$stmt->close();
-		if (!($stmt = $mysqli->prepare("UPDATE Videos SET rented=0
-		WHERE id = $_POST[CheckInOut]")))
-			echo "Prepare for 'UPDATE(1)' failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
-	}
-		
-	else  {
-		$stmt->close();
-		if (!($stmt = $mysqli->prepare("UPDATE Videos SET rented=1
-		WHERE id = $_POST[CheckInOut]")))
-			echo "Prepare for 'UPDATE(2)'failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
-	}
-	
-	if (!$stmt->execute())
-		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error . "<br>";
-	
-	$stmt->close();
-}
+if (isset($_POST['CheckInOut']))	
+	checkInOut($mysqli);
 
 
 
 
-
-
-
-
-	
-
-if (!$mysqli || $mysqli->connect_errno)
-	echo "Connection error: " . $mysqli->connect_errno . " " . $mysqli->connect_error . "<br>";
-else
-	echo "Connected to onid database<br>";
-
+/* Create database if it does not already exist */
 $result = $mysqli->query("SHOW TABLES LIKE 'Videos'");
 if ($result === FALSE)
     echo "Query failed <br>";
@@ -108,10 +60,6 @@ if ($result->num_rows < 1) {
 	else
 		echo "failed to create table (" . $mysqli->errno . ") " . $mysqli->error . "<br>"; 
 }
-
-
-
-
 
 
 
@@ -182,35 +130,7 @@ $statement->close();
 
 
 
-function isValidInput($mysqli, $name, $length) {
-	
-	/* Make sure video name doesn't already exist in database */
-	if (!($statement = $mysqli->prepare("SELECT name FROM Videos")))
-		echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
 
-	$statement->bind_param("s", $n); 
-	if (!$statement->execute()) {
-		echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
-	}
-	$statement->bind_result($resultName);
-	
-	while ($statement->fetch()) {
-		if ($resultName == $name) {
-			echo "$name already exists in database<br>";
-			return FALSE;
-		}
-	}
-
-	$statement->close();
-	
-	/* Make sure "length" is a number */
-	if (!is_numeric($length)) {
-		echo "length must be a number<br>";
-		return FALSE;
-	}
-	
-	return TRUE;
-}
 
 	
 ?>
