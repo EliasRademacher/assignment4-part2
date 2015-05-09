@@ -89,6 +89,38 @@ if(isset($_POST['name_input']) AND strlen($_POST['name_input']) != 0
 
 
 
+
+
+/* Determine categories that exist */
+$categories = array();
+
+if (!($statement = $mysqli->prepare("SELECT category FROM Videos")))
+	echo "prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
+$statement->bind_param("s", $category); 
+if (!$statement->execute())
+	echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
+$statement->bind_result($resultCategory);
+
+while ($statement->fetch()) {	
+	if (!in_array($resultCategory, $categories)) {
+		array_push($categories, $resultCategory);
+	}
+}
+$statement->close();
+
+echo "<p>Filter Videos by Category</p>";
+echo "<select>";
+foreach ($categories as $c) {
+	echo "<option value=Select a Category>$c</option>";
+}
+echo "</select>";
+
+
+
+
+
+
+
 /* Display Table */
 if (!($statement = $mysqli->prepare("SELECT id, name, category, length, rented FROM Videos")))
 	echo "prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
@@ -124,15 +156,6 @@ echo "</table>";
 echo "</form>";
 $statement->close();
 
-
-
-
-
-
-
-
-
-	
 ?>
 
 

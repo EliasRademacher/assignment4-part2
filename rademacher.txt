@@ -1,6 +1,6 @@
 Start: Sat, 9 May 2015 13:20:00 -0800
-End: 
-Tasks: Get check in/out to work, 
+End: Sat, 9 May 2015 15:16:00 -0800
+Tasks: Get check in/out to work, add drop-down menu
 
 Start: Sat, 9 May 2015 12:00:00 -0800
 End: Sat, 9 May 2015 12:30:00 -0800
