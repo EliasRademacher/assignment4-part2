@@ -1,3 +1,11 @@
+Start: Sat, 9 May 2015 12:00:00 -0800
+End: Sat, 9 May 2015 12:30:00 -0800
+Tasks: Implement "Delete All" functionality
+
+Start: Sat, 9 May 2015 09:00:00 -0800
+End: Sat, 9 May 2015 09:45:00 -0800
+Tasks: Add check in/out buttons, add mySQLI logic to delete a row
+
 Start: Fri, 8 May 2015 21:00:00 -0800
 End: Fri, 8 May 2015 23:00:00 -0800
 Tasks: Work on getting delete button to send request
