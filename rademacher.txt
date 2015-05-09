@@ -1,0 +1,19 @@
+Start: Fri, 8 May 2015 21:00:00 -0800
+End: Fri, 8 May 2015 23:00:00 -0800
+Tasks: Work on getting delete button to send request
+
+Start: Fri, 8 May 2015 13:30:00 -0800
+End: Fri, 8 May 2015 16:15:00 -0800
+Tasks: Add delete buttons, work on getting them to send request
+
+Start: Fri, 8 May 2015 09:00:00 -0800
+End: Fri, 8 May 2015 10:45:00 -0800
+Tasks: Add checks for invalid input, have web page display "rented" column of database
+
+Start: Thu, 7 May 2015 20:36:00 -0800
+End: Thu, 7 May 2015 21:40:00 -0800
+Tasks: Tried to get videoStore.php to accept text input
+
+Start: Thu, 7 May 2015 17:00:00 -0800
+End: Thu, 7 May 2015 18:00:00 -0800
+Tasks: Created video database

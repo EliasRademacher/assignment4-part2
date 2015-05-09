@@ -4,7 +4,7 @@
  </head>
  <body>
 	<p>Add a video to the database: </p>
-	<form method="GET">
+	<form method="POST">
 		<p>name: <input type="text" name="name_input" /></p>
 		<p>category: <input type="text" name="category_input" /></p>
 		<p>length: <input type="text" name="length_input" /></p>
@@ -53,14 +53,14 @@ else
 
 
 /* Add video to database */
-if(isset($_GET['name_input']) AND strlen($_GET['name_input']) != 0
-	AND isset($_GET['category_input']) AND strlen($_GET['category_input']) != 0
-	AND isset($_GET['length_input']) AND strlen($_GET['length_input']) != 0
+if(isset($_POST['name_input']) AND strlen($_POST['name_input']) != 0
+	AND isset($_POST['category_input']) AND strlen($_POST['category_input']) != 0
+	AND isset($_POST['length_input']) AND strlen($_POST['length_input']) != 0
 	) {
 	
-	$name = str_replace ('\'', '\\\'', $_GET['name_input']);
-	$category = str_replace ('\'', '\\\'', $_GET['category_input']);
-	$length = $_GET['length_input'];
+	$name = str_replace ('\'', '\\\'', $_POST['name_input']);
+	$category = str_replace ('\'', '\\\'', $_POST['category_input']);
+	$length = $_POST['length_input'];
 	
 	if (isValidInput($mysqli, $name, $length)) {
 		if (!($statement = $mysqli->prepare("INSERT INTO Videos(name, category, length) VALUES
@@ -86,6 +86,7 @@ if (!$statement->execute()) {
 }
 $statement->bind_result($resultID, $resultName, $resultCategory, $resultLength, $resultRented);
 
+echo "<td><form method=POST>";
 echo "<table border='1'>";
 echo "<tr>";
 echo "<th></th>";
@@ -95,7 +96,7 @@ echo "<th>Length (min)</th>";
 echo "<th>Status</th>";
 while ($statement->fetch()) {
 	echo "<tr>";
-	echo "<td><button type=button onclick=deleteRow(1)>Delete</button></td>";
+    echo "<td><button type=submit name=delete value=$resultID>Delete</button></td>";	
 	echo "<td>$resultName</td>";
 	echo "<td>$resultCategory</td>";
 	echo "<td>$resultLength</td>";
@@ -106,15 +107,8 @@ while ($statement->fetch()) {
 	echo "</tr>";
 }
 echo "</table>";
+echo "</form>";
 $statement->close();
-
-function  deleteRow($row) {
-	echo "$row<br>";
-}
-
-
-
-
 
 function isValidInput($mysqli, $name, $length) {
 	
@@ -146,7 +140,16 @@ function isValidInput($mysqli, $name, $length) {
 	return TRUE;
 }
 	
+function deleteRow() {
+    var_dump($_POST);
+}
+
+if (isset($_POST['delete'])) {
+    deleteRow();
+}
+	
 ?>
+
 
  </body>
 </html>
