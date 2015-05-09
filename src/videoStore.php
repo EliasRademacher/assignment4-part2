@@ -42,7 +42,37 @@ if (isset($_POST['deleteAll'])) {
 }
 
 if (isset($_POST['CheckInOut'])) {
-    var_dump($_POST);
+	
+	if (!($stmt = $mysqli->prepare("SELECT rented FROM Videos
+		WHERE id = $_POST[CheckInOut]")))
+			echo "Prepare for 'SELECT' failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
+	
+	$stmt->bind_param("i", $r); 
+	if (!$stmt->execute()) {
+		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error . "<br>";
+	}
+	$stmt->bind_result($isRented);
+	
+	$stmt->fetch();
+	
+	if ($isRented) {
+		$stmt->close();
+		if (!($stmt = $mysqli->prepare("UPDATE Videos SET rented=0
+		WHERE id = $_POST[CheckInOut]")))
+			echo "Prepare for 'UPDATE(1)' failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
+	}
+		
+	else  {
+		$stmt->close();
+		if (!($stmt = $mysqli->prepare("UPDATE Videos SET rented=1
+		WHERE id = $_POST[CheckInOut]")))
+			echo "Prepare for 'UPDATE(2)'failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
+	}
+	
+	if (!$stmt->execute())
+		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error . "<br>";
+	
+	$stmt->close();
 }
 
 
@@ -131,7 +161,7 @@ while ($statement->fetch()) {
 	echo "<tr>";
     echo "<td>";
 	echo "<button type=submit name=deleteID value=$resultID>Delete</button>";
-	echo "<button type=submit name=CheckInOut>Check in/out</button>";
+	echo "<button type=submit name=CheckInOut value=$resultID>Check in/out</button>";
 	echo "</td>";	
 	echo "<td>$resultName</td>";
 	echo "<td>$resultCategory</td>";
