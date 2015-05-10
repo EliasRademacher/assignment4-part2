@@ -76,7 +76,42 @@ function checkInOut($mysqli) {
 	$stmt->close();	
 }
 
+function getCategories($mysqli){
+	$categories = array();
 
+	if (!($stmt = $mysqli->prepare("SELECT category FROM Videos")))
+		echo "prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
+	$stmt->bind_param("s", $category); 
+	if (!$stmt->execute())
+		echo "Execute failed: (" . $stmt->errno . ") " . $stmt->error . "<br>";
+	$stmt->bind_result($resultCategory);
+
+	while ($stmt->fetch()) {	
+		if (!in_array($resultCategory, $categories)) {
+			array_push($categories, $resultCategory);
+		}
+	}
+	$stmt->close();
+	
+	return $categories;
+	
+}
+
+function displayRow($name, $category, $length, $id, $rented) {
+	echo "<tr>";
+	echo "<td>";
+	echo "<button type=submit name=deleteID value=$id>Delete</button>";
+	echo "<button type=submit name=CheckInOut value=$id>Check in/out</button>";
+	echo "</td>";	
+	echo "<td>$name</td>";
+	echo "<td>$category</td>";
+	echo "<td>$length</td>";
+	if ($rented)
+		echo "<td>checked out</td>";
+	else
+		echo "<td>available</td>";
+	echo "</tr>";
+}
 
 
 

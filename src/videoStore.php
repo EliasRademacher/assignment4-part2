@@ -3,8 +3,8 @@
   <title>Video Store</title>
  </head>
  <body>
-	<p>Add a video to the database: </p>
 	<form method="POST">
+		<p>Add a video to the database: </p>
 		<p>name: <input type="text" name="name_input" /></p>
 		<p>category: <input type="text" name="category_input" /></p>
 		<p>length: <input type="text" name="length_input" /></p>
@@ -13,8 +13,8 @@
 
 <?php
 include 'videoStoreFunctions.php';
-error_reporting(E_ALL);
-ini_set('display_errors', 'On');
+//error_reporting(E_ALL);
+//ini_set('display_errors', 'On');
 
 $mysqli = new mysqli("oniddb.cws.oregonstate.edu",
 	"rademace-db", "8xYcLE6mhsNKxGMP", "rademace-db");
@@ -88,35 +88,17 @@ if(isset($_POST['name_input']) AND strlen($_POST['name_input']) != 0
 
 
 
+$categories = getCategories($mysqli);
 
-
-
-/* Determine categories that exist */
-$categories = array();
-
-if (!($statement = $mysqli->prepare("SELECT category FROM Videos")))
-	echo "prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
-$statement->bind_param("s", $category); 
-if (!$statement->execute())
-	echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
-$statement->bind_result($resultCategory);
-
-while ($statement->fetch()) {	
-	if (!in_array($resultCategory, $categories)) {
-		array_push($categories, $resultCategory);
-	}
-}
-$statement->close();
-
-echo "<p>Filter Videos by Category</p>";
-echo "<select>";
+echo "<form method=POST>";
+echo "<select name=category>";
+echo "<option name=category value=all>All Movies</option>";
 foreach ($categories as $c) {
-	echo "<option value=Select a Category>$c</option>";
+	echo "<option name=category value=$c>$c</option>";
 }
 echo "</select>";
-
-
-
+echo "<button type=submit>Filter Videos by Category</button>";
+echo "</form>";
 
 
 
@@ -129,7 +111,7 @@ if (!$statement->execute())
 	echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
 $statement->bind_result($resultID, $resultName, $resultCategory, $resultLength, $resultRented);
 
-echo "<td><form method=POST>";
+echo "<form method=POST>";
 echo "<table border='1'>";
 echo "<tr>";
 echo "<th><button type=submit name=deleteAll><font color=red>Delete all Videos</font></button></th>";
@@ -138,19 +120,14 @@ echo "<th>Category</th>";
 echo "<th>Length (min)</th>";
 echo "<th>Status</th>";
 while ($statement->fetch()) {
-	echo "<tr>";
-    echo "<td>";
-	echo "<button type=submit name=deleteID value=$resultID>Delete</button>";
-	echo "<button type=submit name=CheckInOut value=$resultID>Check in/out</button>";
-	echo "</td>";	
-	echo "<td>$resultName</td>";
-	echo "<td>$resultCategory</td>";
-	echo "<td>$resultLength</td>";
-	if ($resultRented)
-		echo "<td>checked out</td>";
-	else
-		echo "<td>available</td>";
-	echo "</tr>";
+	
+	if (!isset($_POST['category']) OR strcmp($_POST['category'], 'all') == 0)		
+		displayRow($resultName, $resultCategory, $resultLength, $resultID, $resultRented);
+	
+	else {
+		if (strcmp($_POST['category'], $resultCategory) == 0)			
+			displayRow($resultName, $resultCategory, $resultLength, $resultID, $resultRented);
+	}		
 }
 echo "</table>";
 echo "</form>";
