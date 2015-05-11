@@ -65,22 +65,27 @@ if ($result->num_rows < 1) {
 
 
 /* Add video to database */
-if(isset($_POST['name_input']) AND strlen($_POST['name_input']) != 0
-	AND isset($_POST['category_input']) AND strlen($_POST['category_input']) != 0
-	AND isset($_POST['length_input']) AND strlen($_POST['length_input']) != 0
+if(isset($_POST['name_input'])
+	AND isset($_POST['category_input'])
+	AND isset($_POST['length_input'])
 	) {
+		
+	if (strlen($_POST['name_input']) == 0)
+		echo "<font color=orange>name is a required field</font><br>";
 	
-	$name = str_replace ('\'', '\\\'', $_POST['name_input']);
-	$category = str_replace ('\'', '\\\'', $_POST['category_input']);
-	$length = $_POST['length_input'];
-	
-	if (isValidInput($mysqli, $name, $length)) {
-		if (!($statement = $mysqli->prepare("INSERT INTO Videos(name, category, length) VALUES
-			('$name', '$category', '$length')")))
-			echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
+	else {
+		$name = str_replace ('\'', '\\\'', $_POST['name_input']);
+		$category = str_replace ('\'', '\\\'', $_POST['category_input']);
+		$length = $_POST['length_input'];
+		
+		if (isValidInput($mysqli, $name, $length)) {
+			if (!($statement = $mysqli->prepare("INSERT INTO Videos(name, category, length) VALUES
+				('$name', '$category', '$length')")))
+				echo "Prepare failed: (" . $mysqli->errno . ") " . $mysqli->error . "<br>";
 
-		if (!$statement->execute())
-			echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
+			if (!$statement->execute())
+				echo "Execute failed: (" . $statement->errno . ") " . $statement->error . "<br>";
+		}
 	}
 }
 

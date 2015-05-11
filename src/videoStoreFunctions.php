@@ -22,7 +22,12 @@ function isValidInput($mysqli, $name, $length) {
 	
 	/* Make sure "length" is a number */
 	if (!is_numeric($length)) {
-		echo "length must be a number<br>";
+		echo "<font color=orange>length must be a number</font><br>";
+		return FALSE;
+	}
+	
+	if (intval($length) < 0) {
+		echo "<font color=orange>length must be a positive number</font><br>";
 		return FALSE;
 	}
 	
